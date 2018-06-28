@@ -39,6 +39,10 @@
 #define INPUT_PHYS_NAME "synaptics_dsx/input0"
 #define DEBUGFS_DIR_NAME "ts_debug"
 
+#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+#include <linux/input/doubletap2wake.h>
+#endif
+
 #ifdef KERNEL_ABOVE_2_6_38
 #define TYPE_B_PROTOCOL
 #endif
@@ -4123,6 +4127,14 @@ static int synaptics_rmi4_suspend(struct device *dev)
 		rmi4_data->staying_awake = false;
 	}
 
+#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+	if (dt2w_switch) {
+		dt2w_scr_suspended = true;
+		enable_irq_wake(rmi4_data->irq);
+		return 0;
+	}
+#endif
+
 	if (rmi4_data->suspended) {
 		dev_info(dev, "Already in suspend state\n");
 		return 0;
@@ -4220,6 +4232,14 @@ static int synaptics_rmi4_resume(struct device *dev)
 
 	if (!rmi4_data->suspended)
 		return 0;
+
+	#ifdef CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE
+	if (dt2w_switch) {
+		dt2w_scr_suspended = false;
+		disable_irq_wake(rmi4_data->irq);
+		return 0;
+	}
+	#endif
 
 	synaptics_secure_touch_stop(rmi4_data, 1);
 
