@@ -32,12 +32,6 @@
 		qcom,msm-mbhc-hphl-swh = <1>; /* headphone detection */
 		qcom,max-aux-codec = <0>;
 	};
-	/* disable kernel boot-logo: */
-	mdss_mdp: qcom,mdss_mdp@1a00000 {
-		mdss_fb0: qcom,mdss_fb_primary {
-			/delete-property/ qcom,mdss-fb-splash-logo-enabled;
-		};
-	};
 	/* pin configuration */
 	tlmm_pinmux: pinctrl@1000000 {
 		/* charger pins: */
